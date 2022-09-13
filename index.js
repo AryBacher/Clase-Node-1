@@ -1,7 +1,8 @@
 console.log("Hello")
+console.log("Nacho")
 
 for (var i = 0; i < 9; i++) {
-    console.log();
+    console.log(i);
 }
 
 // Git en Powershell
