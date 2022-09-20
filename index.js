@@ -20,6 +20,10 @@ const express = require("express");
 const app = express();
 const port = 9000;
 
+app.use(express.json());
+
+const menu = require('./menu.json');
+
 const users = [
     { id: 1, name: "John Doe" },
     { id: 2, name: "Jane Doe" },
@@ -43,6 +47,60 @@ app.get("/users/:id", (req, res) => {
         res.status(404).send("User not found");
     else
         res.status(200).json(user);
+});
+
+//Ejercicio 1
+app.get("/menu", (req, res) => {
+    res.json(menu)
+});
+
+//Ejercicio 2
+app.get("/menu/:id", (req, res) => {
+    const id = parseInt(req.params.id);
+    const menus = menu.find((menus) => menus.id === id);
+
+    if (!menus)
+        res.status(404).send("Dish not found");
+    else
+        res.status(200).json(menus);
+});
+
+//Ejercicio 3
+app.get("/principales", (req, res) => {
+    const principales2 = menu.filter((menus) => menus.tipo === "principal");
+
+    res.json(principales2);
+});
+
+//Ejercicio 4
+app.get("/postres", (req, res) => {
+    const postres2 = menu.filter((menus) => menus.tipo === "postre");
+
+    res.json(postres2);
+});
+
+//Ejercicio 5
+app.get("/bebidas", (req, res) => {
+    const bebidas2 = menu.filter((menus) => menus.tipo === "bebida");
+
+    res.json(bebidas2);
+});
+
+//Ejercicio 6
+app.post("/pedido", (req, res) => {
+    const pedido = req.body.productos
+
+    //const menus = menu.find((menus) => menus.id === id);
+
+    //const id_menus = menu.filter((menus) => menus.id === id);
+
+    //console.log(id_menus)
+
+    const precio = pedido.reduce((acc, plato) => {
+
+    }, 0);
+
+    //res.json(pedido)
 });
 
 app.listen(port, () => {
