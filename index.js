@@ -90,17 +90,12 @@ app.get("/bebidas", (req, res) => {
 app.post("/pedido", (req, res) => {
     const pedido = req.body.productos
 
-    //const menus = menu.find((menus) => menus.id === id);
-
-    //const id_menus = menu.filter((menus) => menus.id === id);
-
-    //console.log(id_menus)
-
-    const precio = pedido.reduce((acc, plato) => {
-
+    const precio = pedido.reduce((precio_total, plato) => {
+        const plato_id = menu.find((menus) => menus.id === plato.id)
+        return precio_total + plato_id.precio * plato.cantidad
     }, 0);
 
-    //res.json(pedido)
+    res.json({"msg": "Pedido recibido", "precio": precio});
 });
 
 app.listen(port, () => {
