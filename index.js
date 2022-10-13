@@ -35,7 +35,7 @@ connection.connect((err) => {
     console.log("> Connected to database");
 })
 
-//Ejercicio 1
+//Ejercicio 1 DB
 app.get("/menu", (req, res) => {
     connection.query("SELECT * FROM PLATO", (err,rows) =>{
         if (err) return res.status(500).send("Error al pedir el menú")
@@ -43,7 +43,7 @@ app.get("/menu", (req, res) => {
     })
 });
 
-//Ejercicio 2
+//Ejercicio 2 DB
 app.get("/menu/:id", (req, res) => {
     const id = parseInt(req.params.id);
     connection.query("SELECT * FROM plato WHERE id = ?", [id], (err,rows) => {
@@ -53,7 +53,7 @@ app.get("/menu/:id", (req, res) => {
     })
 });
 
-//Ejercicio 3
+//Ejercicio 3 DB
 app.get("/principales", (req, res) => {
     connection.query("SELECT * FROM plato WHERE tipo = ?", ["principal"], (err,rows) => {
         if (!rows.length) return res.status(500).send("No hay platos principales")
@@ -61,7 +61,7 @@ app.get("/principales", (req, res) => {
     })
 });
 
-//Ejercicio 4
+//Ejercicio 4 DB
 app.get("/postres", (req, res) => {
     connection.query("SELECT * FROM plato WHERE tipo = ?", ["postre"], (err,rows) => {
         if (!rows.length) return res.status(500).send("No hay platos de postre")
@@ -69,7 +69,7 @@ app.get("/postres", (req, res) => {
     })
 });
 
-//Ejercicio 5
+//Ejercicio 5 DB
 app.get("/bebidas", (req, res) => {
     connection.query("SELECT * FROM plato WHERE tipo = ?", ["bebida"], (err,rows) => {
         if (!rows.length) return res.status(500).send("No hay bebidas disponsibles")
@@ -77,23 +77,34 @@ app.get("/bebidas", (req, res) => {
     })
 });
 
-//Ejercicio 6
+//Ejercicio 6 DB
 app.post("/pedido", (req, res) => {
     const pedido = req.body.productos
-    console.log(pedido.id)
-    connection.query("SELECT precio FROM plato WHERE id = ?", [pedido.id], (err,rows) => {
+    const pedidoID = pedido.map((elemento) => elemento.id)
+    const pedidoCant = pedido.map((elemento) => elemento.cantidad)
 
+    console.log(pedidoID)
+    console.log(pedidoCant)
+
+    connection.query(`SELECT precio FROM plato WHERE id IN (${
+        Array.from({ length: pedidoID.length}, (_, i) => i > pedidoID.length - 1 ? '?' : '?')
+    })`, [... pedidoID], (err,rows) => {
+        if (err) return res.status(500).send("Ha ocurrido un error")
+        if (!rows.length) return res.status(500).send("Pedido Incorrecto")
+
+        let precioTotal = 0
+        for (let i=0; i < rows.length; i++){
+            precioTotal += rows[i].precio * pedidoCant[i] 
+        }
+        res.json(precioTotal)
     })
-    connection.query("SELECT precio FROM plato WHERE id in (?, ?)", [pedido.id], (err,rows) => {
-        
-    })
 
-    const precio = pedido.reduce((precio_total, plato) => {
-        const plato_id = menu.find((menus) => menus.id === plato.id)
-        return precio_total + plato_id.precio * plato.cantidad
-    }, 0);
+    //const precio = pedido.reduce((precio_total, plato) => {
+        //const plato_id = menu.find((menus) => menus.id === plato.id)
+        //return precio_total + plato_id.precio * plato.cantidad
+    //}, 0);
 
-    res.json({"msg": "Pedido recibido", "precio": precio});
+    //res.json({"msg": "Pedido recibido", "precio": precio});
 });
 
 app.get("users/:id"), (req, res) => {
